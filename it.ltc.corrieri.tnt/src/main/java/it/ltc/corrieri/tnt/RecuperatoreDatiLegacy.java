@@ -45,14 +45,15 @@ public class RecuperatoreDatiLegacy {
 			CriteriaBuilder cb = em.getCriteriaBuilder();
 	        CriteriaQuery<TestaCorr> criteria = cb.createQuery(TestaCorr.class);
 	        Root<TestaCorr> member = criteria.from(TestaCorr.class);
-	        riferimentoSpedizione = riferimentoSpedizione.replaceAll("DDT", "");
-	        riferimentoSpedizione = riferimentoSpedizione.replaceAll("/", "");
+	        //riferimentoSpedizione = riferimentoSpedizione.replaceAll("DDT", "");
+	        //riferimentoSpedizione = riferimentoSpedizione.replaceAll("/", "");
 	        Predicate condizioneRiferimentoLike = cb.like(member.get("mittenteAlfa"), "%" + riferimentoSpedizione + "%");
 	        //Predicate condizioneRiferimento = cb.equal(member.get("mittenteAlfa"), riferimentoSpedizione);
 	        //FIXME - Per ora vado a controllare solo il riferimento, se funziona bene.
 	        //criteria.select(member).where(cb.and(condizioneRiferimento, condizioneDestinatario));
-	        criteria.select(member).where(condizioneRiferimentoLike);
-	        List<TestaCorr> list = em.createQuery(criteria).setMaxResults(1).getResultList();
+	        criteria.select(member).where(condizioneRiferimentoLike); //.orderBy(cb.desc(member.get("dataSpe")));
+	        //Massimo 2 per non sprecare tempo, prendo il risultato però solo se ne trovo una e non c'è ambiguità.
+	        List<TestaCorr> list = em.createQuery(criteria).setMaxResults(2).getResultList();
 	        testata = list.size() == 1 ? list.get(0) : null;
 	        //Se non sono riuscito a trovarla così ritento
 	        if (testata == null && !destinatarioSpedizione.isEmpty()) {
@@ -68,7 +69,8 @@ public class RecuperatoreDatiLegacy {
 	        	Predicate condizioneAnno = cb.equal(member.get("annoSpe"), anno);
 	        	Predicate condizioneDestinatario = cb.equal(member.get("ragSocDest"), destinatarioSpedizione);
 	        	criteria.select(member).where(cb.and(condizioneAnno, condizioneData, condizioneDestinatario));
-		        List<TestaCorr> list2 = em.createQuery(criteria).setMaxResults(1).getResultList();
+	        	//Massimo 2 per non sprecare tempo, prendo il risultato però solo se ne trovo una e non c'è ambiguità.
+	        	List<TestaCorr> list2 = em.createQuery(criteria).setMaxResults(2).getResultList();
 		        testata = list2.size() == 1 ? list2.get(0) : null;
 	        }
 	        em.close();

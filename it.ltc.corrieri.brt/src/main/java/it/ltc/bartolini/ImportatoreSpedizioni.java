@@ -20,6 +20,7 @@ import it.ltc.database.model.centrale.JoinCommessaCorriere;
 import it.ltc.database.model.centrale.Sede;
 import it.ltc.database.model.centrale.Spedizione;
 import it.ltc.database.model.centrale.SpedizioneContrassegno;
+import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
 import it.ltc.database.model.legacy.TestaCorr;
 
 
@@ -187,7 +188,7 @@ public class ImportatoreSpedizioni extends Importatore {
 		spedizione.setRiferimentoMittente(riferimento);
 		spedizione.setServizio(getTipoServizio(esito.getTipoServizioBolle()));
 		spedizione.setStato("IMP");
-		spedizione.setFatturazione(Spedizione.Fatturazione.FATTURABILE);
+		spedizione.setFatturazione(Fatturazione.FATTURABILE);
 		double volume = esito.getVolume() != null ? esito.getVolume() : 0;
 		if (volume == 0 && vecchia != null)
 			spedizione.setVolume(vecchia.getVolume());

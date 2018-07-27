@@ -326,16 +326,16 @@ public class RigaFNVAC extends RigaBRT {
 		//Dati spedizione
 		annoSpedizione = parseInteger(campi[mappaColonne.get("VACAAS")]);
 		meseGiornoSpedizione = campi[mappaColonne.get("VACMGS")];
-		numeroSpedizione = su.getFormattedString(campi[mappaColonne.get("VACNSP")], 7, '0');
-		numeroSerie = su.getFormattedString(campi[mappaColonne.get("VACNRS")], 2, '0');
+		numeroSpedizione = su.getFormattedString(campi[mappaColonne.get("VACNSP")], 7, "0", false);
+		numeroSerie = su.getFormattedString(campi[mappaColonne.get("VACNRS")], 2, "0", false);
 		riferimentoMittenteNumerico = parseInteger(campi[mappaColonne.get("VACRMN")]);
 		riferimentoMittenteAlfabetico = campi[mappaColonne.get("VACRMA")];
 		numeroColli = parseInteger(campi[mappaColonne.get("VACNCL")]);
 		peso = parseDouble(campi[mappaColonne.get("VACPKB")]);
 		volume = parseDouble(campi[mappaColonne.get("VACVLB")]);
-		filialePartenza = su.getFormattedString(campi[mappaColonne.get("VACAAS")], 3, '0');
-		filialeArrivo = su.getFormattedString(campi[mappaColonne.get("VACLNA")], 3, '0');
-		codiceClienteMittente = su.getFormattedString(campi[mappaColonne.get("VACCCM")], 7, '0');
+		filialePartenza = su.getFormattedString(campi[mappaColonne.get("VACAAS")], 3, "0", false);
+		filialeArrivo = su.getFormattedString(campi[mappaColonne.get("VACLNA")], 3, "0", false);
+		codiceClienteMittente = su.getFormattedString(campi[mappaColonne.get("VACCCM")], 7, "0", false);
 		codiceBolla = campi[mappaColonne.get("VACCBO")];
 		
 		//Destinatario

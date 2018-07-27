@@ -20,8 +20,8 @@
 		</dependency>
 		<dependency>
 			<groupId>it.ltc.database</groupId>
-			<artifactId>dao</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>configuration</artifactId>
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
 </project>

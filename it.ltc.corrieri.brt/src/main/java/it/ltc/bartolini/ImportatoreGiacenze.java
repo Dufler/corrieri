@@ -21,6 +21,7 @@ import it.ltc.database.dao.FactoryManager;
 import it.ltc.database.model.centrale.JoinCommessaCorriere;
 import it.ltc.database.model.centrale.Spedizione;
 import it.ltc.database.model.centrale.SpedizioneGiacenza;
+import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
 
 public class ImportatoreGiacenze extends Importatore {
 	
@@ -84,7 +85,7 @@ public class ImportatoreGiacenze extends Importatore {
 			EntityManager em = FactoryManager.getInstance().getFactory(persistenceUnitName).createEntityManager();
 			giacenza = em.find(SpedizioneGiacenza.class, giacenza.getId());
 			giacenza.setDataChiusura(esito.getDataChiusura());
-			giacenza.setFatturazione(SpedizioneGiacenza.Fatturazione.FATTURABILE);
+			giacenza.setFatturazione(Fatturazione.FATTURABILE);
 			ChiusuraGiacenza codiceChiusura = esito.getCodiceChiusura();
 			//Controllo la destinazione delle merce
 			if (codiceChiusura == ChiusuraGiacenza._002) {
@@ -124,7 +125,7 @@ public class ImportatoreGiacenze extends Importatore {
 			Date chiusura = esito.getDataChiusura() != null && esito.getDataChiusura().after(apertura) ? esito.getDataChiusura() : null;
 			giacenza.setDataApertura(apertura);
 			giacenza.setDataChiusura(chiusura);
-			SpedizioneGiacenza.Fatturazione fatturazione = isFatturabile(esito) ? SpedizioneGiacenza.Fatturazione.FATTURABILE : SpedizioneGiacenza.Fatturazione.IN_DEFINIZIONE;
+			Fatturazione fatturazione = isFatturabile(esito) ? Fatturazione.FATTURABILE : Fatturazione.IN_DEFINIZIONE;
 			giacenza.setFatturazione(fatturazione);
 			giacenza.setIdCommessa(spedizione.getIdCommessa());
 			giacenza.setIdDestinatario(spedizione.getIndirizzoDestinazione());

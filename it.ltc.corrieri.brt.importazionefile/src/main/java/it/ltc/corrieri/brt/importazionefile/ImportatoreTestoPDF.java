@@ -15,8 +15,8 @@ import javax.persistence.EntityTransaction;
 import it.ltc.database.dao.FactoryManager;
 import it.ltc.database.model.centrale.Indirizzo;
 import it.ltc.database.model.centrale.Spedizione;
-import it.ltc.database.model.centrale.Spedizione.Fatturazione;
 import it.ltc.database.model.centrale.Spedizione.TipoSpedizione;
+import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
 
 public class ImportatoreTestoPDF {
 	

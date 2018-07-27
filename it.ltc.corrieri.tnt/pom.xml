@@ -96,13 +96,23 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.database</groupId>
-			<artifactId>dao</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>it.ltc.database.model</groupId>
 			<artifactId>legacy</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>configuration</artifactId>
+			<version>0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.database.dao</groupId>
+			<artifactId>common</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.utility.csv</groupId>
+			<artifactId>it.ltc.utility.csv</artifactId>
 			<version>1.0</version>
 		</dependency>
 	</dependencies>

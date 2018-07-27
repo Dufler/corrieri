@@ -36,6 +36,7 @@ import it.ltc.database.model.centrale.Tracking;
 import it.ltc.database.model.centrale.TrackingPK;
 import it.ltc.database.model.centrale.TrackingStatoCodificaCorriere;
 import it.ltc.database.model.centrale.TrackingStatoCodificaCorrierePK;
+import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
 import it.ltc.database.model.legacy.TestaCorr;
 import it.ltc.utility.mail.Email;
 import it.ltc.utility.mail.MailMan;
@@ -284,7 +285,7 @@ public class Importatore {
 		spedizione.setRiferimentoMittente(riferimento);
 		spedizione.setServizio(getTipoServizio(dati.getTipoServizio()));
 		spedizione.setStato("IMP");
-		spedizione.setFatturazione(Spedizione.Fatturazione.IN_DEFINIZIONE);
+		spedizione.setFatturazione(Fatturazione.IN_DEFINIZIONE);
 		TipoSpedizione tipoSpedizione = getTipoSpedizione(destinatario);
 		spedizione.setTipo(tipoSpedizione);
 		//Se ho trovato corrispondenza nei sistemi legacy lo indico
@@ -414,7 +415,8 @@ public class Importatore {
 			transaction.commit();
 		} catch (Exception e) {
 			printStackTrace(e);
-			transaction.rollback();
+			if (transaction != null && transaction.isActive())
+				transaction.rollback();
 			throw new RuntimeException("Impossibile aggiornare la giacenza '" + trovata.getLetteraDiVettura() + "'");
 		}
 		
@@ -432,7 +434,7 @@ public class Importatore {
 			Indirizzo m = recuperaMittente(spedizione);
 			SpedizioneGiacenza giacenza = new SpedizioneGiacenza();
 			giacenza.setDataApertura(spedizione.getDataPartenzaSpedizione());
-			giacenza.setFatturazione(SpedizioneGiacenza.Fatturazione.IN_DEFINIZIONE);
+			giacenza.setFatturazione(Fatturazione.IN_DEFINIZIONE);
 			giacenza.setLetteraDiVettura(spedizione.getLetteraDiVettura());
 			giacenza.setLetteraDiVetturaOriginale(spedizione.getLetteraDiVetturaOriginaria());
 			giacenza.setIdDestinatario(d.getId());
@@ -449,7 +451,8 @@ public class Importatore {
 			} catch (Exception e) {
 				logger.error("Impossibile inserire le informazioni di giacenza per LDV '" + spedizione.getLetteraDiVetturaOriginaria() + "'");
 				printStackTrace(e);
-				transaction.rollback();
+				if (transaction != null && transaction.isActive())
+					transaction.rollback();
 				throw new RuntimeException("Impossibile inserire la giacenza: '" + s.getLetteraDiVettura() + "'");
 			}			
 		} else {
@@ -468,7 +471,7 @@ public class Importatore {
 		int idDestinatario = spedizione.getIndirizzoDestinazione();
 		int idMittente = spedizione.getIndirizzoPartenza();
 		giacenza.setDataApertura(esito.getDataVariazione());
-		giacenza.setFatturazione(SpedizioneGiacenza.Fatturazione.IN_DEFINIZIONE);
+		giacenza.setFatturazione(Fatturazione.IN_DEFINIZIONE);
 		giacenza.setLetteraDiVettura(letteraDiVettura);
 		giacenza.setLetteraDiVetturaOriginale(spedizione.getLetteraDiVettura());
 		giacenza.setIdDestinatario(idDestinatario);
@@ -485,7 +488,8 @@ public class Importatore {
 		} catch (Exception e) {
 			logger.error("Impossibile inserire la giacenza con LDV originale '" + letteraDiVettura + "'");
 			printStackTrace(e);
-			transaction.rollback();
+			if (transaction != null && transaction.isActive())
+				transaction.rollback();
 			//throw new RuntimeException("Impossibile inserire la giacenza '" + letteraDiVettura + "'");
 		}			
 		return giacenza;
@@ -590,8 +594,8 @@ public class Importatore {
 			//Se la spedizione è stata presa in carico dal corriere controllo lo stato di fatturazione.
 			if (stato.equals("S01") || stato.equals("S02") || stato.equals("S03") || stato.equals("S04")) {
 				//Se la spedizione è ancora segnata come non fatturabile allora la rendo fatturabile.
-				if (spedizioneTrovata.getFatturazione() == Spedizione.Fatturazione.IN_DEFINIZIONE) {
-					spedizioneTrovata.setFatturazione(Spedizione.Fatturazione.FATTURABILE);
+				if (spedizioneTrovata.getFatturazione() == Fatturazione.IN_DEFINIZIONE) {
+					spedizioneTrovata.setFatturazione(Fatturazione.FATTURABILE);
 				}
 			}
 			EntityTransaction transaction = em.getTransaction();
@@ -721,11 +725,11 @@ public class Importatore {
 				//Inoltre se era in giacenza allora la chiudo
 				if (giacenza != null && isFinale(codificaStato.getStato())) {
 					giacenza.setDataChiusura(data);
-					giacenza.setFatturazione(SpedizioneGiacenza.Fatturazione.FATTURABILE);
+					giacenza.setFatturazione(Fatturazione.FATTURABILE);
 					EntityTransaction transaction = em.getTransaction();
 					try {
 						transaction.begin();
-						em.merge(giacenza);
+						em.persist(giacenza);
 						transaction.commit();
 					} catch (Exception e) {
 						printStackTrace(e);
@@ -749,14 +753,14 @@ public class Importatore {
 				spedizione.setStato(codificaStato.getStato());
 				//Fatturabilità
 				if (codificaStato.getStato().equals("S01") || codificaStato.getStato().equals("S02") || codificaStato.getStato().equals("S03") || codificaStato.getStato().equals("S04")) {
-					if (spedizione.getFatturazione() == Spedizione.Fatturazione.IN_DEFINIZIONE)
-						spedizione.setFatturazione(Spedizione.Fatturazione.FATTURABILE);
+					if (spedizione.getFatturazione() == Fatturazione.IN_DEFINIZIONE)
+						spedizione.setFatturazione(Fatturazione.FATTURABILE);
 				}
 				//Giacenza
 				if (codificaStato.getStato().equals("C01")) {
 					if (giacenza == null || !giacenza.getLetteraDiVettura().equals(esito.getLetteraDiVettura()))
 						inserisciGiacenza(esito, spedizione);
-					else
+					else if (giacenza.getDataChiusura() == null) //FIX: vado ad aggiornare la data di apertura solo se non è ancora chiusa, ci sono casi in cui si riapre più volte e potrebbe prenderlo in maniera errata.
 						aggiornaGiacenza(giacenza, esito);
 					spedizione.setGiacenza(true);
 				}
@@ -787,7 +791,7 @@ public class Importatore {
 				EntityTransaction transaction2 = em.getTransaction();
 				try {
 					transaction2.begin();
-					em.persist(tracking);
+					em.merge(tracking); //Uso merge invece di persist perchè potrebbe già esistere, vengono duplicati spesso.
 					transaction2.commit();
 				} catch (Exception e) {
 					printStackTrace(e);

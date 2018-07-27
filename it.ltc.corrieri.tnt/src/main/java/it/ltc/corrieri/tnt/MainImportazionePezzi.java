@@ -33,7 +33,6 @@ public class MainImportazionePezzi {
 	private static int aggiornamentiNomeData = 0;
 	
 	
-	
 	public static void main(String[] args) {
 		//RecuperatoreDatiLegacy rdl = RecuperatoreDatiLegacy.getInstance();
 		//Recupero le info sulla commessa
@@ -76,7 +75,8 @@ public class MainImportazionePezzi {
 		for (Spedizione spedizione : spedizioni) {
 			Indirizzo destinatario = getDestinatario(spedizione);
 			String ragioneSociale = destinatario != null ? destinatario.getRagioneSociale() : "";
-			TestaCorr legacy = recuperaTestata(commessa.getNomeRisorsa(), spedizione.getRiferimentoCliente(), ragioneSociale, spedizione.getDataPartenza());
+			TestaCorr legacy = RecuperatoreDatiLegacy.getInstance().recuperaTestata(commessa.getNomeRisorsa(), spedizione.getRiferimentoCliente(), ragioneSociale, spedizione.getDataPartenza());
+			//TestaCorr legacy = recuperaTestata(commessa.getNomeRisorsa(), spedizione.getRiferimentoCliente(), ragioneSociale, spedizione.getDataPartenza());
 			//Se la trovo aggiorno i pezzi e lo stato di completezza
 			if (legacy != null) {
 				aggiornaSpedizione(spedizione, legacy);
@@ -166,50 +166,50 @@ public class MainImportazionePezzi {
 		return commessa;
 	}
 	
-	private static TestaCorr recuperaTestata(String nomeRisorsa, String riferimentoSpedizione, String destinatarioSpedizione, Date dataSpedizione) {
-		TestaCorr testata = null;
-		//Controllo che sia una persistence unit esistente, verrà cambiato/tolto in futuro.
-		if (nomeRisorsa.startsWith("legacy-") && !riferimentoSpedizione.isEmpty()) {
-			EntityManager em = FactoryManager.getInstance().getFactory(nomeRisorsa).createEntityManager();
-			CriteriaBuilder cb = em.getCriteriaBuilder();
-	        CriteriaQuery<TestaCorr> criteria = cb.createQuery(TestaCorr.class);
-	        Root<TestaCorr> member = criteria.from(TestaCorr.class);
-	        riferimentoSpedizione = riferimentoSpedizione.replaceAll("DDT", "");
-	        riferimentoSpedizione = riferimentoSpedizione.replaceAll("/", "");
-	        Predicate condizioneRiferimentoLike = cb.like(member.get("mittenteAlfa"), "%" + riferimentoSpedizione + "%");
-	        //Predicate condizioneRiferimento = cb.equal(member.get("mittenteAlfa"), riferimentoSpedizione);
-	        //FIXME - Per ora vado a controllare solo il riferimento, se funziona bene.
-	        //criteria.select(member).where(cb.and(condizioneRiferimento, condizioneDestinatario));
-	        criteria.select(member).where(condizioneRiferimentoLike);
-	        List<TestaCorr> list = em.createQuery(criteria).setMaxResults(2).getResultList();
-	        testata = list.size() == 1 ? list.get(0) : null;
-	        if (testata != null)
-	        	aggiornamentiRiferimento += 1;
-	        //Se non sono riuscito a trovarla così ritento
-	        if (testata == null && !destinatarioSpedizione.isEmpty()) {
-	        	GregorianCalendar data = new GregorianCalendar();
-	        	data.setTime(dataSpedizione);
-	        	int anno = data.get(Calendar.YEAR);
-	        	int giorno = data.get(Calendar.DAY_OF_MONTH);
-	        	data.set(Calendar.DAY_OF_MONTH, giorno - 2);
-	        	int meseGiornoInizio = (data.get(Calendar.MONTH) + 1) * 100 + data.get(Calendar.DAY_OF_MONTH);
-	        	data.set(Calendar.DAY_OF_MONTH, giorno + 4);
-	        	int meseGiornoFine = (data.get(Calendar.MONTH) + 1) * 100 + data.get(Calendar.DAY_OF_MONTH);
-	        	Predicate condizioneData = cb.between(member.get("dataSpe"), meseGiornoInizio, meseGiornoFine);
-	        	Predicate condizioneAnno = cb.equal(member.get("annoSpe"), anno);
-	        	Predicate condizioneDestinatario = cb.equal(member.get("ragSocDest"), destinatarioSpedizione);
-	        	criteria.select(member).where(cb.and(condizioneAnno, condizioneData, condizioneDestinatario));
-		        List<TestaCorr> list2 = em.createQuery(criteria).setMaxResults(1).getResultList();
-		        testata = list2.size() == 1 ? list2.get(0) : null;
-		        if (testata != null)
-		        	aggiornamentiNomeData += 1;
-	        }
-	        em.close();
-		}
-		if (testata != null) {
-			System.out.println("Testata trovata! Pezzi: " + testata.getPezzi());
-		}
-		return testata;
-	}
+//	private static TestaCorr recuperaTestata(String nomeRisorsa, String riferimentoSpedizione, String destinatarioSpedizione, Date dataSpedizione) {
+//		TestaCorr testata = null;
+//		//Controllo che sia una persistence unit esistente, verrà cambiato/tolto in futuro.
+//		if (nomeRisorsa.startsWith("legacy-") && !riferimentoSpedizione.isEmpty()) {
+//			EntityManager em = FactoryManager.getInstance().getFactory(nomeRisorsa).createEntityManager();
+//			CriteriaBuilder cb = em.getCriteriaBuilder();
+//	        CriteriaQuery<TestaCorr> criteria = cb.createQuery(TestaCorr.class);
+//	        Root<TestaCorr> member = criteria.from(TestaCorr.class);
+//	        riferimentoSpedizione = riferimentoSpedizione.replaceAll("DDT", "");
+//	        riferimentoSpedizione = riferimentoSpedizione.replaceAll("/", "");
+//	        Predicate condizioneRiferimentoLike = cb.like(member.get("mittenteAlfa"), "%" + riferimentoSpedizione + "%");
+//	        //Predicate condizioneRiferimento = cb.equal(member.get("mittenteAlfa"), riferimentoSpedizione);
+//	        //FIXME - Per ora vado a controllare solo il riferimento, se funziona bene.
+//	        //criteria.select(member).where(cb.and(condizioneRiferimento, condizioneDestinatario));
+//	        criteria.select(member).where(condizioneRiferimentoLike);
+//	        List<TestaCorr> list = em.createQuery(criteria).setMaxResults(2).getResultList();
+//	        testata = list.size() == 1 ? list.get(0) : null;
+//	        if (testata != null)
+//	        	aggiornamentiRiferimento += 1;
+//	        //Se non sono riuscito a trovarla così ritento
+//	        if (testata == null && !destinatarioSpedizione.isEmpty()) {
+//	        	GregorianCalendar data = new GregorianCalendar();
+//	        	data.setTime(dataSpedizione);
+//	        	int anno = data.get(Calendar.YEAR);
+//	        	int giorno = data.get(Calendar.DAY_OF_MONTH);
+//	        	data.set(Calendar.DAY_OF_MONTH, giorno - 2);
+//	        	int meseGiornoInizio = (data.get(Calendar.MONTH) + 1) * 100 + data.get(Calendar.DAY_OF_MONTH);
+//	        	data.set(Calendar.DAY_OF_MONTH, giorno + 4);
+//	        	int meseGiornoFine = (data.get(Calendar.MONTH) + 1) * 100 + data.get(Calendar.DAY_OF_MONTH);
+//	        	Predicate condizioneData = cb.between(member.get("dataSpe"), meseGiornoInizio, meseGiornoFine);
+//	        	Predicate condizioneAnno = cb.equal(member.get("annoSpe"), anno);
+//	        	Predicate condizioneDestinatario = cb.equal(member.get("ragSocDest"), destinatarioSpedizione);
+//	        	criteria.select(member).where(cb.and(condizioneAnno, condizioneData, condizioneDestinatario));
+//		        List<TestaCorr> list2 = em.createQuery(criteria).setMaxResults(2).getResultList();
+//		        testata = list2.size() == 1 ? list2.get(0) : null;
+//		        if (testata != null)
+//		        	aggiornamentiNomeData += 1;
+//	        }
+//	        em.close();
+//		}
+//		if (testata != null) {
+//			System.out.println("Testata trovata! Pezzi: " + testata.getPezzi());
+//		}
+//		return testata;
+//	}
 
 }
