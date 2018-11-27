@@ -81,38 +81,38 @@
 			<version>1.2.17</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.utility.configuration</groupId>
-			<artifactId>it.ltc.utility.configuration</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>it.ltc.utility.mail</groupId>
-			<artifactId>it.ltc.utility.mail</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>it.ltc.database.model</groupId>
-			<artifactId>centrale</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>it.ltc.database.model</groupId>
-			<artifactId>legacy</artifactId>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>configuration</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>it.ltc.database</groupId>
-			<artifactId>configuration</artifactId>
-			<version>0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>it.ltc.database.dao</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>model-centrale</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.utility.csv</groupId>
-			<artifactId>it.ltc.utility.csv</artifactId>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>model-legacy</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>dao</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>dao-common</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>csv</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>mail</artifactId>
 			<version>1.0</version>
 		</dependency>
 	</dependencies>

@@ -69,6 +69,7 @@
                 </plugin>
 		</plugins>
 	</build>
+	
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.apache.axis/axis -->
 		<dependency>
@@ -105,29 +106,29 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.utility.configuration</groupId>
-			<artifactId>it.ltc.utility.configuration</artifactId>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>configuration</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.utility.mail</groupId>
-			<artifactId>it.ltc.utility.mail</artifactId>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>model-centrale</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.database.model</groupId>
-			<artifactId>centrale</artifactId>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>mail</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>it.ltc.database</groupId>
 			<artifactId>dao</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>it.ltc.database.model</groupId>
-			<artifactId>legacy</artifactId>
-			<version>1.0</version>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>model-legacy</artifactId>
+			<version>1.1</version>
 		</dependency>
 	</dependencies>
 </project>

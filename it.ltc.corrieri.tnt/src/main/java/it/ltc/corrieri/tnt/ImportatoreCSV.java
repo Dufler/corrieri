@@ -26,7 +26,7 @@ public class ImportatoreCSV {
 
 	private static final Logger logger = Logger.getLogger(ImportatoreCSV.class);
 	
-	private static final String persistenceUnit = "produzione"; //"test"; //
+	private static final String persistenceUnit = "produzione";
 	
 	private static ImportatoreCSV instance;
 	
@@ -45,7 +45,7 @@ public class ImportatoreCSV {
 	
 	public static void main(String[] args) throws Exception {
 		ImportatoreCSV importatore = ImportatoreCSV.getInstance();
-		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\trackingGiugno.csv");
+		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\trackingOttobre2018.csv");
 	}
 	
 	private ImportatoreCSV() {
@@ -208,7 +208,7 @@ public class ImportatoreCSV {
 		destinatario.setCap(aggiustaCAP(riga[12]));
 		destinatario.setProvincia(riga[14]);
 		destinatario.setNazione("ITA");
-		Indirizzo entity = daoIndirizzi.inserisci(destinatario);
+		Indirizzo entity = daoIndirizzi.salvaIndirizzo(destinatario);
 		int id = entity != null ? entity.getId() : -1;
 		return id;
 	}
@@ -227,7 +227,7 @@ public class ImportatoreCSV {
 		mittente.setCap(aggiustaCAP(riga[6]));
 		mittente.setProvincia(riga[8]);
 		mittente.setNazione("ITA");
-		Indirizzo entity = daoIndirizzi.inserisci(mittente);
+		Indirizzo entity = daoIndirizzi.salvaIndirizzo(mittente);
 		int id = entity != null ? entity.getId() : -1;
 		return id;
 	}
