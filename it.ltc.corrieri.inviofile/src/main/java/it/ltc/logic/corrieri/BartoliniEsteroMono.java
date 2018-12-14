@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import it.ltc.logica.database.model.sqlserver.ltc.CorrieriPerCliente;
+import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
 import it.ltc.utility.mail.Email;
 
 public class BartoliniEsteroMono extends InvioFileTesto {

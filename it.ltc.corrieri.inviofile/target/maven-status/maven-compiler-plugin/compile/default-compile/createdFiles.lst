@@ -1,0 +1,8 @@
+it\ltc\logic\corrieri\BartoliniEsteroMulti.class
+it\ltc\logic\corrieri\Corriere.class
+it\ltc\logic\corrieri\FactoryCorrieri.class
+it\ltc\logic\corrieri\InvioExcel.class
+it\ltc\logic\corrieri\InvioFileTesto.class
+it\ltc\logic\corrieri\InvioMail.class
+it\ltc\logic\InvioFileCorriereMain.class
+it\ltc\logic\corrieri\BartoliniEsteroMono.class

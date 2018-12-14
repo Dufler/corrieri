@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
 import it.ltc.logic.InvioFileCorriereMain;
-import it.ltc.logica.database.model.sqlserver.ltc.CorrieriPerCliente;
 import it.ltc.utility.mail.MailMan;
 
 public abstract class InvioMail extends Corriere {
@@ -62,8 +62,8 @@ public abstract class InvioMail extends Corriere {
 				throw new Exception("Non è stato specificato l'indirizzo del responsabile a cui inviare il riepilogo.");
 		}
 		//Controlli sulle cartelle specificate
-		pathCartellaFile = configurazioneCliente.getPercorsoFile();
-		pathCartellaStorico = configurazioneCliente.getPercorsoStorico();
+		pathCartellaFile = configurazioneCliente.getCartellaFile();
+		pathCartellaStorico = configurazioneCliente.getCartellaStorico();
 		cartellaFile = new File(pathCartellaFile);
 		if (!cartellaFile.isDirectory())
 			throw new IOException("La cartella specificata per i file non esiste: '" + cartellaFile.getAbsolutePath() + "'");

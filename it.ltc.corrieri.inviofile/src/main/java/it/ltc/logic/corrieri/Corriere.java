@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import it.ltc.logica.database.model.sqlserver.ltc.CorrieriPerCliente;
+import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
 
 
 public abstract class Corriere {

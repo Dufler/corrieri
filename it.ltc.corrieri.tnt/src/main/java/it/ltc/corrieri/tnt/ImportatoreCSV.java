@@ -45,7 +45,7 @@ public class ImportatoreCSV {
 	
 	public static void main(String[] args) throws Exception {
 		ImportatoreCSV importatore = ImportatoreCSV.getInstance();
-		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\trackingOttobre2018.csv");
+		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\tracking_Novembre.csv");
 	}
 	
 	private ImportatoreCSV() {
