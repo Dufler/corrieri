@@ -153,8 +153,7 @@ public class MainImportazioneTNT {
 			logger.info("(FTP) Termino la sessione.");
 			client.disconnect(true);
 		} catch (Exception e) {
-			logger.error(e);
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
 

@@ -80,20 +80,6 @@ public class FileTNT {
 		} else
 			logger.warn("(FileTNT) Non è stato possibile recuperare le info di controllo sul file TNT.");
 	}
-
-//	private List<String> leggiFile(String path) {
-//		LinkedList<String> righe = new LinkedList<String>();
-//		try (FileReader fReader = new FileReader(path); BufferedReader bReader = new BufferedReader(fReader);) {
-//			String line = bReader.readLine();
-//			while (line != null) {
-//				righe.add(line);
-//				line = bReader.readLine();
-//			}
-//		} catch (IOException e) {
-//			logger.error(e);
-//		}
-//		return righe;
-//	}
 	
 	private List<String> leggiFile(File file) {
 		LinkedList<String> righe = new LinkedList<String>();
@@ -104,7 +90,7 @@ public class FileTNT {
 				line = bReader.readLine();
 			}
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		return righe;
 	}

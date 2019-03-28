@@ -120,11 +120,11 @@ public abstract class Importatore {
         Root<Cap> member = criteria.from(Cap.class);
         Predicate condizione;
         if (localita != null && !localita.isEmpty()) {
-        	Predicate condizioneCAP = cb.equal(member.get("id").get("cap"), cap);
-        	Predicate condizioneLocalita = cb.equal(member.get("id").get("localita"), localita);
+        	Predicate condizioneCAP = cb.equal(member.get("cap"), cap);
+        	Predicate condizioneLocalita = cb.equal(member.get("localita"), localita);
         	condizione = cb.and(condizioneCAP, condizioneLocalita);
         } else {
-        	condizione = cb.equal(member.get("id").get("cap"), cap);
+        	condizione = cb.equal(member.get("cap"), cap);
         }
         criteria.select(member).where(condizione);
         List<Cap> list = em.createQuery(criteria).setMaxResults(1).getResultList();
@@ -141,7 +141,7 @@ public abstract class Importatore {
 	}
 	
 	protected int recuperaDocumento(JoinCommessaCorriere codice, String riferimento) {
-		int idOrdine;
+		int idOrdine = -1;
 		//Provo a vedere se esiste già un documento che faccia riferimento a quella spedizione.
 		//I criteri utilizzati sono la commessa, il riferimento e il tipo di documento (Ordine)
 		EntityManager em = FactoryManager.getInstance().getFactory(persistenceUnitName).createEntityManager();
@@ -167,12 +167,17 @@ public abstract class Importatore {
         		transaction.begin();
             	em.persist(nuovoDocumento);
             	transaction.commit();
+            	idOrdine = nuovoDocumento.getId();
         	} catch (Exception e) {
-        		transaction.rollback();
-        		logger.error(e.getStackTrace());
-        		throw new RuntimeException("Impossibile inserire il nuovo documento");
+        		logger.error(e.getMessage(), e);
+        		if (transaction != null && transaction.isActive())
+        			transaction.rollback();        		
+        	} finally {
+        		em.close();
         	}
-        	idOrdine = nuovoDocumento.getId();
+        	//Se non sono riuscito ad inserire il documento sollevo l'eccezione.
+        	if (idOrdine == -1)
+        		throw new RuntimeException("Impossibile inserire il nuovo documento");
         } else {
         	idOrdine = list.get(0).getId();
         }
@@ -223,13 +228,16 @@ public abstract class Importatore {
             	em.persist(indirizzo);
             	transaction.commit();
         	} catch (Exception e) {
-        		logger.error(e.getStackTrace());
+        		logger.error(e.getMessage(), e);
         		if (transaction != null && transaction.isActive())
         			transaction.rollback();
-        		throw new RuntimeException("Impossibile inserire il nuovo indirizzo.");
+        		indirizzo = null;
         	} finally {
         		em.close();
         	}
+        	//Se non sono riuscito ad inserire l'indirizzo sollevo l'eccezione.
+        	if (indirizzo == null)
+        		throw new RuntimeException("Impossibile inserire il nuovo indirizzo.");
 		} else {
 			indirizzo = list.get(0);
 		}

@@ -55,8 +55,7 @@ public class MainImportazioneBartolini {
 						}
 					}
 				} catch (Exception e) {
-					for (StackTraceElement st : e.getStackTrace())
-						logger.error(st.toString());
+					logger.error(e.getMessage(), e);
 					String message = "Errore durante l'elaborazione del file " + fileEsito.getName() + ", controllare il file di log.";
 					sendAlertEmail(message);
 				}
@@ -79,63 +78,3 @@ public class MainImportazioneBartolini {
 	}
 	
 }
-
-//public class MainImportazioneBartolini {
-//	
-//	private static final Logger logger = Logger.getLogger(MainImportazioneBartolini.class);
-//	
-//	private static final Database db = Database.PRODUZIONE;
-//	
-//	private static final String pathCartellaEsiti = "E:/ftpserver/bartolini/in/";
-//	private static final String pathStoricoCartellaEsiti = "E:/ftpserver/bartolini/in/storico/";
-//
-//	//Se è true cerca gli esiti per una specifica spedizione, viene usato a fini di test.
-//	private static final boolean test = false; 
-//	
-//	public static void main(String[] args) {
-//		logger.info("Avvio la procedura di importazione dati delle spedizioni BRT");
-//		if (test)
-//			cercaSpedizioneSpecifica();
-//		else try {
-//			Importatore importatore = Importatore.getInstance(db);
-//			RecuperaTestate rt = RecuperaTestate.getInstance();
-//			File cartellaEsiti = new File(pathCartellaEsiti);
-//			for (File fileEsito : cartellaEsiti.listFiles()) {
-//				if (fileEsito.isFile()) {
-//					if (fileEsito.getName().endsWith("TXT")) {
-//						FileReader fileReader = new FileReader(fileEsito);
-//						BufferedReader reader = new BufferedReader(fileReader);
-//						String line = reader.readLine();
-//						while (line != null) {
-//							TestaCorr trovata = rt.recuperaTestata(line);
-//							importatore.importaSpedizione(line, trovata);
-//							line = reader.readLine();
-//						}
-//						reader.close();
-//					}
-//					File fileStorico = new File(pathStoricoCartellaEsiti + fileEsito.getName());
-//					fileEsito.renameTo(fileStorico);
-//					logger.info("Spostato il file: " + fileEsito);
-//				}
-//			}
-//			//Recupero gli esiti per tutte le spedizioni non chiuse
-//			importatore.importaEsiti();
-//		} catch (Exception e) {
-//			for (StackTraceElement st : e.getStackTrace())
-//				logger.error(st.toString());
-//		}
-//		logger.info("Fine procedura.");
-//	}
-//	
-//	private static void cercaSpedizioneSpecifica() {
-//		Spedizione spedizione = new Spedizione();
-//		spedizione.setLetteraDiVettura("026000244809");
-//		spedizione.setDataPartenza(new Date());
-//		spedizione.setIdOrdine(-1);
-//		LinkedList<Tracking> listaTracking = RecuperaEsiti.getInstance().getTracking(spedizione);
-//		for (Tracking t : listaTracking) {
-//			System.out.println(t);
-//		}
-//	}
-//
-//}

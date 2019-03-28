@@ -89,13 +89,13 @@
 		</dependency>
 		<dependency>
 			<groupId>it.ltc.database</groupId>
-			<artifactId>dao-legacy</artifactId>
+			<artifactId>dao-legacy-sede</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>it.ltc.database</groupId>
-			<artifactId>model-legacy</artifactId>
-			<version>1.1</version>
+			<artifactId>model-legacy-sede</artifactId>
+			<version>1.0</version>
 		</dependency>
 	</dependencies>
 	

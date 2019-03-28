@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.RollbackException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -24,7 +25,7 @@ import it.ltc.database.model.centrale.Tracking;
 
 public class ImportatoreEsiti extends Importatore {
 	
-	private static final Logger logger = Logger.getLogger("Importazione Esiti");
+	private static final Logger logger = Logger.getLogger(ImportatoreEsiti.class);
 	
 	private static ImportatoreEsiti instance;
 	
@@ -83,7 +84,7 @@ public class ImportatoreEsiti extends Importatore {
 			update = true;
 			logger.info("Aggiornata la spedizione: " + spedizione.getLetteraDiVettura() + " a " + stato);
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			if (t != null && t.isActive())
 				t.rollback();
 			update = false;
@@ -102,8 +103,12 @@ public class ImportatoreEsiti extends Importatore {
 			em.persist(tracking);
 			t.commit();
 			insert = true;
+		} catch (RollbackException e) {
+			insert = false;
+			if (t != null && t.isActive())
+				t.rollback();
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			if (t != null && t.isActive())
 				t.rollback();
 			insert = false;

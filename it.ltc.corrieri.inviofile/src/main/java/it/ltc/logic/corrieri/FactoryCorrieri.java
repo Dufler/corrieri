@@ -1,6 +1,6 @@
 package it.ltc.logic.corrieri;
 
-import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
+import it.ltc.database.model.legacy.sede.CorrieriPerCliente;
 
 public class FactoryCorrieri {
 	

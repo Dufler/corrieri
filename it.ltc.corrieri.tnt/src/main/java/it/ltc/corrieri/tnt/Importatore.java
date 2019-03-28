@@ -21,13 +21,13 @@ import it.ltc.corrieri.tnt.model.DatiEsito;
 import it.ltc.corrieri.tnt.model.DatiSpedizione;
 import it.ltc.corrieri.tnt.model.FileTNT;
 import it.ltc.database.dao.FactoryManager;
+import it.ltc.database.dao.costanti.NazioneDao;
 import it.ltc.database.model.centrale.Cap;
 import it.ltc.database.model.centrale.CapPK;
 import it.ltc.database.model.centrale.Commessa;
 import it.ltc.database.model.centrale.Documento;
 import it.ltc.database.model.centrale.Indirizzo;
 import it.ltc.database.model.centrale.JoinCommessaCorriere;
-import it.ltc.database.model.centrale.Nazione;
 import it.ltc.database.model.centrale.Spedizione;
 import it.ltc.database.model.centrale.Spedizione.TipoSpedizione;
 import it.ltc.database.model.centrale.SpedizioneContrassegno;
@@ -37,25 +37,31 @@ import it.ltc.database.model.centrale.TrackingPK;
 import it.ltc.database.model.centrale.TrackingStatoCodificaCorriere;
 import it.ltc.database.model.centrale.TrackingStatoCodificaCorrierePK;
 import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
+import it.ltc.database.model.costanti.Nazione;
 import it.ltc.database.model.legacy.TestaCorr;
 import it.ltc.utility.mail.Email;
+import it.ltc.utility.mail.MailConfiguration;
 import it.ltc.utility.mail.MailMan;
 
 public class Importatore {
 	
-	private static final Logger logger = Logger.getLogger("Importatore");
+	private static final Logger logger = Logger.getLogger(Importatore.class);
 	
 	private static Importatore instance;
 	
 	private final EntityManager em;
 	private final RecuperatoreDatiLegacy rdl;
 	private final Set<String> spedizioniInRitardo;
+	
+	private final NazioneDao daoNazioni;
 
 	private Importatore() {
 		ConfigurationUtility config = ConfigurationUtility.getInstance();
 		em = FactoryManager.getInstance().getFactory(config.getPersistenceUnit()).createEntityManager();
 		rdl = RecuperatoreDatiLegacy.getInstance();
 		spedizioniInRitardo = new HashSet<>();
+		
+		daoNazioni = new NazioneDao("produzione-costanti");
 	}
 
 	public static Importatore getInstance() {
@@ -81,7 +87,7 @@ public class Importatore {
 			success = true;
 		} catch (Exception e) {
 			success = false;
-			logger.error("Errore durante l'importazione del file: '" + file.getFile().getName() + "'");
+			logger.error("Errore durante l'importazione del file: '" + file.getFile().getName() + "'", e);
 		}
 		return success;
 	}
@@ -149,7 +155,8 @@ public class Importatore {
 		//destinatariDaAvvisare.add("support@ltc-logistics.it");
 		String emailMittente = "sysinfo@ltc-logistics.it";
 		String passwordMittente = "ltc10183";
-		MailMan postino = new MailMan(emailMittente, passwordMittente, true);
+		MailConfiguration config = MailConfiguration.getArubaPopConfiguration(emailMittente, passwordMittente);
+		MailMan postino = new MailMan(config);
 		boolean invio = postino.invia(destinatariDaAvvisare, mail);
 		if (invio)
 			logger.info("mail di segnalazione dei codici mancanti inviata con successo.");
@@ -206,8 +213,9 @@ public class Importatore {
             	em.persist(nuovoDocumento);
             	transaction.commit();
         	} catch (Exception e) {
-        		transaction.rollback();
-        		printStackTrace(e);
+        		logger.error(e.getMessage(), e);
+        		if (transaction != null && transaction.isActive())
+        			transaction.rollback();
         		throw new RuntimeException("Impossibile inserire il nuovo documento");
         	}
         	idOrdine = nuovoDocumento.getId();
@@ -298,7 +306,7 @@ public class Importatore {
 			em.persist(spedizione);
 			transaction.commit();
 		} catch (Exception e) {
-			printStackTrace(e);
+			logger.error(e.getMessage(), e);
 			transaction.rollback();
 			throw new RuntimeException("Impossibile inserire la spedizione: '" + spedizione.getLetteraDiVettura() + "'");
 		}
@@ -322,7 +330,7 @@ public class Importatore {
 		if (iso == null || iso.isEmpty() || "ITA".equals(iso)) {
 			tipo = TipoSpedizione.ITALIA;
 		} else {
-			Nazione n = em.find(Nazione.class, iso);
+			Nazione n = daoNazioni.trovaDaCodiceISO3(iso);
 			if (n != null) {
 				tipo = n.getUe() ? TipoSpedizione.UE : TipoSpedizione.EXTRA_UE;
 			} else {
@@ -346,7 +354,7 @@ public class Importatore {
 			em.persist(contrassegno);
 			transaction.commit();
 		} catch (Exception e) {
-			printStackTrace(e);
+			logger.error(e.getMessage(), e);
 			transaction.rollback();
 			throw new RuntimeException("Impossibile inserire il contrassegno per la spedizione: '" + spedizione.getLetteraDiVettura() + "'");
 		}
@@ -393,7 +401,7 @@ public class Importatore {
 			em.merge(trovata);
 			transaction.commit();
 		} catch (Exception e) {
-			printStackTrace(e);
+			logger.error(e.getMessage(), e);
 			if (transaction != null && transaction.isActive())
 				transaction.rollback();
 			throw new RuntimeException("Impossibile aggiornare la giacenza '" + trovata.getLetteraDiVettura() + "'");
@@ -414,7 +422,7 @@ public class Importatore {
 			em.merge(trovata);
 			transaction.commit();
 		} catch (Exception e) {
-			printStackTrace(e);
+			logger.error(e.getMessage(), e);
 			if (transaction != null && transaction.isActive())
 				transaction.rollback();
 			throw new RuntimeException("Impossibile aggiornare la giacenza '" + trovata.getLetteraDiVettura() + "'");
@@ -449,8 +457,7 @@ public class Importatore {
 				transaction.commit();
 				logger.info("inserita nuova giacenza da spedizione, LDV: '" + spedizione.getLetteraDiVettura() + "', spedizione LDV: '" + spedizione.getLetteraDiVetturaOriginaria() + "'");
 			} catch (Exception e) {
-				logger.error("Impossibile inserire le informazioni di giacenza per LDV '" + spedizione.getLetteraDiVetturaOriginaria() + "'");
-				printStackTrace(e);
+				logger.error("Impossibile inserire le informazioni di giacenza per LDV '" + spedizione.getLetteraDiVetturaOriginaria() + "'", e);
 				if (transaction != null && transaction.isActive())
 					transaction.rollback();
 				throw new RuntimeException("Impossibile inserire la giacenza: '" + s.getLetteraDiVettura() + "'");
@@ -486,8 +493,7 @@ public class Importatore {
 			transaction.commit();
 			logger.info("inserita nuova giacenza da esito, LDV: '" + letteraDiVettura + "', spedizione LDV: '" + spedizione.getLetteraDiVettura() + "'");
 		} catch (Exception e) {
-			logger.error("Impossibile inserire la giacenza con LDV originale '" + letteraDiVettura + "'");
-			printStackTrace(e);
+			logger.error("Impossibile inserire la giacenza con LDV originale '" + letteraDiVettura + "'", e);
 			if (transaction != null && transaction.isActive())
 				transaction.rollback();
 			//throw new RuntimeException("Impossibile inserire la giacenza '" + letteraDiVettura + "'");
@@ -552,8 +558,9 @@ public class Importatore {
             	em.persist(indirizzo);
             	transaction.commit();
         	} catch (Exception e) {
-        		printStackTrace(e);
-        		transaction.rollback();
+        		logger.error(e.getMessage(), e);
+        		if (transaction != null && transaction.isActive())
+        			transaction.rollback();
         		throw new RuntimeException("Impossibile inserire il nuovo indirizzo.");
         	}
 		} else {
@@ -604,8 +611,9 @@ public class Importatore {
 				em.merge(spedizioneTrovata);
 				transaction.commit();
 			} catch (Exception e) {
-				printStackTrace(e);
-				transaction.rollback();
+				logger.error(e.getMessage(), e);
+				if (transaction != null && transaction.isActive())
+					transaction.rollback();
 				throw new RuntimeException("Impossibile aggiornare la spedizione: '" + spedizioneTrovata.getLetteraDiVettura() + "'");
 			}
 			messaggioStato += "a '" + statoCorriere + "' (" + codifica.getStato() + ") successo!";
@@ -626,8 +634,9 @@ public class Importatore {
 					em.merge(spedizioneTrovata);
 					transaction.commit();
 				} catch (Exception e) {
-					printStackTrace(e);
-					transaction.rollback();
+					logger.error(e.getMessage(), e);
+					if (transaction != null && transaction.isActive())
+						transaction.rollback();
 					throw new RuntimeException("Impossibile aggiornare la spedizione: '" + spedizioneTrovata.getLetteraDiVettura() + "'");
 				}
 				messaggio += "successo!";
@@ -732,8 +741,9 @@ public class Importatore {
 						em.persist(giacenza);
 						transaction.commit();
 					} catch (Exception e) {
-						printStackTrace(e);
-						transaction.rollback();
+						logger.error(e.getMessage(), e);
+						if (transaction != null && transaction.isActive())
+							transaction.rollback();
 						throw new RuntimeException("Impossibile aggiornare la giacenza: '" + giacenza.getLetteraDiVettura() + "'");
 					}
 					logger.info("Chiusura giacenza '" + letteraDiVettura + "'");
@@ -770,7 +780,7 @@ public class Importatore {
 					em.merge(spedizione);
 					transaction.commit();
 				} catch (Exception e) {
-					printStackTrace(e);
+					logger.error(e.getMessage(), e);
 					if (transaction != null && transaction.isActive())
 						transaction.rollback();
 					throw new RuntimeException("Impossibile aggiornare la spedizione: '" + spedizione.getLetteraDiVettura() + "'");
@@ -794,7 +804,7 @@ public class Importatore {
 					em.merge(tracking); //Uso merge invece di persist perchè potrebbe già esistere, vengono duplicati spesso.
 					transaction2.commit();
 				} catch (Exception e) {
-					printStackTrace(e);
+					logger.error(e.getMessage(), e);
 					if (transaction2 != null && transaction2.isActive())
 						transaction2.rollback();
 					//throw new RuntimeException("Impossibile inserire il nuovo tracking: '" + tracking.getId() + "'");
@@ -875,12 +885,6 @@ public class Importatore {
 		}
 		Date scadenza = calendar.getTime();
 		return scadenza;
-	}
-	
-	private void printStackTrace(Exception e) {
-		logger.error(e);
-		for (StackTraceElement element: e.getStackTrace())
-			logger.error(element);
 	}
 
 }

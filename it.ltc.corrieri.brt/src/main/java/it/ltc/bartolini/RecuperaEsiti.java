@@ -112,8 +112,7 @@ public class RecuperaEsiti extends Importatore {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 		return tracking;
 	}

@@ -6,12 +6,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import it.ltc.database.dao.legacy.centrale.CorrieriPerClienteDao;
-import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
+import it.ltc.database.dao.legacy.sede.CorrieriPerClienteDao;
+import it.ltc.database.model.legacy.sede.CorrieriPerCliente;
 import it.ltc.logic.corrieri.Corriere;
 import it.ltc.logic.corrieri.FactoryCorrieri;
 import it.ltc.utility.configuration.Configuration;
 import it.ltc.utility.mail.Email;
+import it.ltc.utility.mail.MailConfiguration;
 import it.ltc.utility.mail.MailMan;
 
 public class InvioFileCorriereMain {
@@ -41,10 +42,9 @@ public class InvioFileCorriereMain {
 				corriere.inviaDati();
 			} catch (Exception e) {
 				//Loggo l'accaduto.
-				e.printStackTrace();
 				String oggettoErrore = "Alert: errore nell'invio del file per il corriere";
 				String messaggioErrore = oggettoErrore + " per il cliente " + cliente.getCliente() + "\r\n\r\n" + e.getMessage();
-				logger.error(messaggioErrore);
+				logger.error(messaggioErrore, e);
 				Email mail = new Email(oggettoErrore, messaggioErrore);
 				postino.invia(destinatariErrore, mail);
 			}
@@ -56,7 +56,8 @@ public class InvioFileCorriereMain {
 		Configuration configurazioneEmail = new Configuration(PATH_CONFIGURAZIONE_EMAIL, false);
 		String username = configurazioneEmail.get("email_mittente_indirizzo");
 		String password = configurazioneEmail.get("email_mittente_password");
-		postino = new MailMan(username, password, false);
+		MailConfiguration config = MailConfiguration.getArubaPopConfiguration(username, password);
+		postino = new MailMan(config);
 		destinatariErrore = new ArrayList<String>();
 		destinatariErrore.add("support@ltc-logistics.it");
 	}

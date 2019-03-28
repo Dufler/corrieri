@@ -25,7 +25,7 @@ import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
 
 public class ImportatoreGiacenze extends Importatore {
 	
-	private static final Logger logger = Logger.getLogger("Importazione Giacenze");
+	private static final Logger logger = Logger.getLogger(ImportatoreGiacenze.class);
 	
 	private static ImportatoreGiacenze instance;
 	private final List<String> codiciMancanti;
@@ -98,6 +98,9 @@ public class ImportatoreGiacenze extends Importatore {
 			if (!note.isEmpty())
 				note += ", ";
 			note += codiceChiusura.toString();
+			//Controllo che le note non siano eccessivamente lunghe.
+			if (note != null && note.length() > 200)
+				note = note.substring(0, 200);
 			giacenza.setNote(note);
 			//aggiornamento
 			EntityTransaction t = em.getTransaction();
@@ -107,8 +110,9 @@ public class ImportatoreGiacenze extends Importatore {
 				t.commit();
 				success = true;
 			} catch (Exception e) {
-				logger.error(e);
-				t.rollback();
+				logger.error(e.getMessage(), e);
+				if (t != null && t.isActive())
+					t.rollback();
 				success = false;
 			} finally {
 				em.close();
@@ -145,8 +149,9 @@ public class ImportatoreGiacenze extends Importatore {
 				t.commit();
 				success = true;
 			} catch (Exception e) {
-				logger.error(e);
-				t.rollback();
+				logger.error(e.getMessage(), e);
+				if (t != null && t.isActive())
+					t.rollback();
 				success = false;
 			} finally {
 				em.close();

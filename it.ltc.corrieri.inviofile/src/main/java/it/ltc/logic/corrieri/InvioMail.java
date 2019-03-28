@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
+import it.ltc.database.model.legacy.sede.CorrieriPerCliente;
 import it.ltc.logic.InvioFileCorriereMain;
 import it.ltc.utility.mail.MailMan;
 

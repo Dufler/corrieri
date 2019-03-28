@@ -87,9 +87,7 @@ public class RecuperaLegendaEventi extends Importatore {
 					}
 				}
 			} catch (Exception e) {
-				logger.error(e);
-				for (StackTraceElement st : e.getStackTrace())
-					logger.error(st);
+				logger.error(e.getMessage(), e);
 			}
 		}
 		return legenda.get(codifica);

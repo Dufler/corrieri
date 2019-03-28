@@ -45,7 +45,7 @@ public class ImportatoreCSV {
 	
 	public static void main(String[] args) throws Exception {
 		ImportatoreCSV importatore = ImportatoreCSV.getInstance();
-		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\tracking_Novembre.csv");
+		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\trackingFebbraio.csv");
 	}
 	
 	private ImportatoreCSV() {
@@ -68,7 +68,7 @@ public class ImportatoreCSV {
 	
 	public void importaFile(String path) throws Exception {
 		File file = new File(path);
-		FileCSV csv = FileCSV.leggiFile(file, true, ";", ";");
+		FileCSV csv = FileCSV.leggiFile(file, true, ";", ";", FileCSV.DEFAULT_DATE_FORMAT);
 		inserimenti = 0;
 		aggiornamenti = 0;
 		for (String[] riga : csv.getRighe()) {
@@ -125,10 +125,9 @@ public class ImportatoreCSV {
 				successo = false;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error("Eccezione per: ");
 			logger.error(riga);
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			successo = false;
 		}
 		return successo;
@@ -168,6 +167,10 @@ public class ImportatoreCSV {
 	private boolean aggiornaSpedizione(Spedizione trovata, String[] riga, TestaCorr vecchia) {
 		//Update info generali
 		trovata.setServizio(getTipoServizio(riga[21]));
+		//stato fatturazione, se ero indeciso se fatturarla perchè non ho ricevuto esiti corretti la segno come fatturabile.
+		if (trovata.getFatturazione() == Fatturazione.IN_DEFINIZIONE) {
+			trovata.setFatturazione(Fatturazione.FATTURABILE);
+		}
 		//Peso
 		double peso = trovaPeso(riga);
 		if (peso > 0)

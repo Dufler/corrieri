@@ -92,7 +92,7 @@ public class FileFNVAC {
 			}
 			reader.close();
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 

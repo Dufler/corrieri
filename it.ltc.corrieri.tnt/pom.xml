@@ -43,7 +43,6 @@
 						</manifestEntries>
 					</archive>
 					<finalName>tnt</finalName>
-					<!-- <finalName>${project.name}</finalName> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -86,6 +85,11 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>configuration-extra</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>it.ltc.database</groupId>
 			<artifactId>model-centrale</artifactId>
 			<version>1.0</version>
@@ -113,6 +117,16 @@
 		<dependency>
 			<groupId>it.ltc.utility</groupId>
 			<artifactId>mail</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>model-costanti</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.database</groupId>
+			<artifactId>dao-costanti</artifactId>
 			<version>1.0</version>
 		</dependency>
 	</dependencies>

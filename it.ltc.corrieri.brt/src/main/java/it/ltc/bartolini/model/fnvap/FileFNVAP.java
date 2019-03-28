@@ -46,7 +46,7 @@ public class FileFNVAP {
 			}
 			reader.close();
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 		}
 	}
 	

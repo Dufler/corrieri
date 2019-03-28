@@ -95,9 +95,8 @@ public class ImportatoreSpedizioni extends Importatore {
 			}
 		} catch (Exception e) {
 			success = false;
-			e.printStackTrace();
 			String message = "Eccezione per la spedizione: '" + esito.getNumeroSpedizione() + "', " + e.getMessage(); 
-			logger.error(message);
+			logger.error(message, e);
 			sendAlertEmail(message);
 		}
 		return success;
@@ -206,9 +205,10 @@ public class ImportatoreSpedizioni extends Importatore {
 			insert = true;
 			logger.info("Spedizione inserita: " + spedizione.getId());
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			insert = false;
-			t.rollback();
+			if (t != null && t.isActive())
+				t.rollback();
 		} finally {
 			em.close();
 		}
@@ -243,9 +243,10 @@ public class ImportatoreSpedizioni extends Importatore {
 			insert = true;
 			logger.info("Contrassegno inserito: " + idSpedizione);
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error(e.getMessage(), e);
 			insert = false;
-			t.rollback();
+			if (t != null && t.isActive())
+				t.rollback();
 		} finally {
 			em.close();
 		}

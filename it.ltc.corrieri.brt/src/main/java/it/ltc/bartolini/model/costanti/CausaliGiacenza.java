@@ -26,7 +26,8 @@ public enum CausaliGiacenza {
 	_035("DOCUMENTI INCOMPLETI O MANCANTI"),                      
 	_037("RIFIUTA LA CONSEGNA TASSATIVA"), 
 	_100("CONSEGNA RICHIESTA OLTRE 72 ORE"),                 
-	_101("A SEGUITO L. AVV. CONCORDATA CONSEGNA OLTRE 72 ORE");
+	_101("A SEGUITO L. AVV. CONCORDATA CONSEGNA OLTRE 72 ORE"),
+	_999("MOTIVO GENERICO (specificato nella descrizione aggiuntiva)");
 	
 	private final String descrizione;
 

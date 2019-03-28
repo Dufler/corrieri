@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import it.ltc.database.model.legacy.centrale.CorrieriPerCliente;
+import it.ltc.database.model.legacy.sede.CorrieriPerCliente;
 import it.ltc.utility.mail.Email;
 
 public class InvioFileTesto extends InvioMail {

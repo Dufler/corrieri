@@ -44,7 +44,6 @@
 						</manifestEntries>
 					</archive>
 					<finalName>brt</finalName>
-<!-- 					<finalName>${project.name}</finalName> -->
 				</configuration>
 			</plugin>
 			 <plugin>
@@ -108,6 +107,11 @@
 		<dependency>
 			<groupId>it.ltc.utility</groupId>
 			<artifactId>configuration</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>it.ltc.utility</groupId>
+			<artifactId>configuration-extra</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
