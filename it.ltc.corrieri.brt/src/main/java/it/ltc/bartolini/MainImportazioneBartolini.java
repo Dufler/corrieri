@@ -1,7 +1,7 @@
 package it.ltc.bartolini;
 
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -68,7 +68,7 @@ public class MainImportazioneBartolini {
 	
 	private static void sendAlertEmail(String message) {
 		ConfigurationUtility config = ConfigurationUtility.getInstance();
-		List<String> destinatari = config.getIndirizziResponsabili();
+		Set<String> destinatari = config.getIndirizziResponsabili();
 		String subject = "Alert - Errore durante l'importazione dati BRT";
 		MailMan mailer = config.getMailMan();
 		Email mail = new Email(subject, message);

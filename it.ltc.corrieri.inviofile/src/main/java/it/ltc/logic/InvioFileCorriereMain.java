@@ -1,8 +1,9 @@
 package it.ltc.logic;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -25,7 +26,7 @@ public class InvioFileCorriereMain {
 	private static CorrieriPerClienteDao managerClienti;
 	
 	private static MailMan postino;
-	private static List<String> destinatariErrore;
+	private static Set<String> destinatariErrore;
 
 	public static void main(String[] args) throws IOException {
 		logger.info("Inizio Procedura");
@@ -58,7 +59,7 @@ public class InvioFileCorriereMain {
 		String password = configurazioneEmail.get("email_mittente_password");
 		MailConfiguration config = MailConfiguration.getArubaPopConfiguration(username, password);
 		postino = new MailMan(config);
-		destinatariErrore = new ArrayList<String>();
+		destinatariErrore = new HashSet<String>();
 		destinatariErrore.add("support@ltc-logistics.it");
 	}
 	

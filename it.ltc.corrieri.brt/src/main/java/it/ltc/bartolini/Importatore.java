@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -292,7 +293,7 @@ public abstract class Importatore {
 	}
 	
 	protected boolean sendAlertEmail(String message) {
-		List<String> destinatari = config.getIndirizziResponsabili();
+		Set<String> destinatari = config.getIndirizziResponsabili();
 		String subject = "Alert - Errore durante l'importazione dati BRT";
 		MailMan mailer = config.getMailMan();
 		Email mail = new Email(subject, message);

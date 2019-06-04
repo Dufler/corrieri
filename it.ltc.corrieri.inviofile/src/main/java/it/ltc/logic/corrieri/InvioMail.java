@@ -2,8 +2,8 @@ package it.ltc.logic.corrieri;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import it.ltc.database.model.legacy.sede.CorrieriPerCliente;
 import it.ltc.logic.InvioFileCorriereMain;
@@ -16,8 +16,8 @@ public abstract class InvioMail extends Corriere {
 	protected MailMan postino;
 	protected String indirizzoCorriere;
 	protected String indirizzoResponsabili;
-	protected List<String> destinatariCorriere;
-	protected List<String> destinatariRiepilogo;
+	protected Set<String> destinatariCorriere;
+	protected Set<String> destinatariRiepilogo;
 	
 	public InvioMail(CorrieriPerCliente cliente) {
 		super(cliente);
@@ -39,7 +39,7 @@ public abstract class InvioMail extends Corriere {
 		if (indirizzoCorriere == null || indirizzoCorriere.isEmpty()) {
 			throw new Exception("Non è stato specificato l'indirizzo del corriere a cui inviare i file.");
 		} else {
-			destinatariCorriere = new ArrayList<String>();
+			destinatariCorriere = new HashSet<String>();
 			String[] indirizzi = indirizzoCorriere.split(",");
 			for (String indirizzo : indirizzi) {
 				if (indirizzo != null && !indirizzo.isEmpty())
@@ -52,7 +52,7 @@ public abstract class InvioMail extends Corriere {
 		if (indirizzoResponsabili == null || indirizzoResponsabili.isEmpty()) {
 			throw new Exception("Non è stato specificato l'indirizzo del responsabile a cui inviare il riepilogo.");
 		} else {
-			destinatariRiepilogo = new ArrayList<String>();
+			destinatariRiepilogo = new HashSet<String>();
 			String[] indirizzi = indirizzoResponsabili.split(",");
 			for (String indirizzo : indirizzi) {
 				if (indirizzo != null && !indirizzo.isEmpty())

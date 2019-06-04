@@ -100,7 +100,10 @@ public class ImportatoreEsiti extends Importatore {
 		EntityTransaction t = em.getTransaction();
 		try {
 			t.begin();
-			em.persist(tracking);
+			//Controllo se è già presente a sistema
+			Tracking esistente = em.find(Tracking.class, tracking.getId());
+			if (esistente == null)
+				em.persist(tracking);
 			t.commit();
 			insert = true;
 		} catch (RollbackException e) {

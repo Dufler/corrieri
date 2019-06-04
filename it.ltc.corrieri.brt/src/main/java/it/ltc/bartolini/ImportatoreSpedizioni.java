@@ -21,7 +21,7 @@ import it.ltc.database.model.centrale.Sede;
 import it.ltc.database.model.centrale.Spedizione;
 import it.ltc.database.model.centrale.SpedizioneContrassegno;
 import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
-import it.ltc.database.model.legacy.TestaCorr;
+import it.ltc.database.model.legacy.TestaCorrLight;
 
 
 /**
@@ -73,7 +73,7 @@ public class ImportatoreSpedizioni extends Importatore {
 			if (codiceCliente != null) {
 				Commessa commessa = getCommessa(codiceCliente.getCommessa());
 				Date dataSpedizione = sdf.parse(esito.getAnnoSpedizione() + esito.getMeseGiornoSpedizione());
-				TestaCorr vecchia = rt.recuperaTestata(commessa.getNomeRisorsa(), esito.getRiferimentoMittenteNumerico(), esito.getRagioneSocialeDestinatario(), dataSpedizione);
+				TestaCorrLight vecchia = rt.recuperaTestata(commessa.getNomeRisorsa(), esito.getRiferimentoMittenteNumerico(), esito.getRagioneSocialeDestinatario(), dataSpedizione);
 				String letteraDiVettura = getLetteraDiVettura(esito);
 				Spedizione trovata = recuperaSpedizione(codiceCliente.getCodiceCliente(), letteraDiVettura);
 				boolean spedizionePresente = (trovata != null);
@@ -114,17 +114,17 @@ public class ImportatoreSpedizioni extends Importatore {
 		return letteraDiVettura;
 	}
 	
-	private boolean aggiornaSpedizione(Spedizione trovata, RigaFNVAB esito, TestaCorr vecchia) {
+	private boolean aggiornaSpedizione(Spedizione trovata, RigaFNVAB esito, TestaCorrLight vecchia) {
 		boolean update;
 		if (vecchia != null && vecchia.getPezzi() > 0) {
 			trovata.setPezzi(vecchia.getPezzi());
 			trovata.setDatiCompleti(true);
 			Double peso = trovata.getPeso();
-			if ((peso == null || peso <= 0) && vecchia.getPeso() != null) {
+			if ((peso == null || peso <= 0)) {
 				trovata.setPeso(vecchia.getPeso());
 			}
 			Double volume = trovata.getVolume();
-			if ((volume == null || volume <= 0) && vecchia.getVolume() != null) {
+			if ((volume == null || volume <= 0)) {
 				trovata.setVolume(vecchia.getVolume());
 			}
 			EntityManager em = FactoryManager.getInstance().getFactory(persistenceUnitName).createEntityManager();
@@ -148,7 +148,7 @@ public class ImportatoreSpedizioni extends Importatore {
 		return update;
 	}
 	
-	private boolean inserisciNuovaSpedizione(JoinCommessaCorriere codiceCliente, int idDocumento, TestaCorr vecchia, RigaFNVAB esito) throws Exception {
+	private boolean inserisciNuovaSpedizione(JoinCommessaCorriere codiceCliente, int idDocumento, TestaCorrLight vecchia, RigaFNVAB esito) throws Exception {
 		Spedizione spedizione = new Spedizione();
 		//Inserisci informazioni spedizione
 		spedizione.setIdDocumento(idDocumento);

@@ -1,6 +1,5 @@
 package it.ltc.corrieri.tnt;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,7 +37,7 @@ import it.ltc.database.model.centrale.TrackingStatoCodificaCorriere;
 import it.ltc.database.model.centrale.TrackingStatoCodificaCorrierePK;
 import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
 import it.ltc.database.model.costanti.Nazione;
-import it.ltc.database.model.legacy.TestaCorr;
+import it.ltc.database.model.legacy.TestaCorrLight;
 import it.ltc.utility.mail.Email;
 import it.ltc.utility.mail.MailConfiguration;
 import it.ltc.utility.mail.MailMan;
@@ -150,7 +149,7 @@ public class Importatore {
 	
 	private void inviaMail(String oggetto, String messaggio) {
 		Email mail = new Email(oggetto, messaggio);
-		List<String> destinatariDaAvvisare = new ArrayList<String>();
+		Set<String> destinatariDaAvvisare = new HashSet<String>();
 		destinatariDaAvvisare.add("damiano.bellucci@ltc-logistics.it");
 		//destinatariDaAvvisare.add("support@ltc-logistics.it");
 		String emailMittente = "sysinfo@ltc-logistics.it";
@@ -169,7 +168,7 @@ public class Importatore {
 		String riferimentoSpedizione = spedizione.getRiferimentoMittente();
 		String destinatarioSpedizione = spedizione.getRagioneSocialeDestinatario();
 		Date dataSpedizione = spedizione.getDataPartenzaSpedizione();
-		TestaCorr spedizioneLegacy = rdl.recuperaTestata(nomeRisorsa, riferimentoSpedizione, destinatarioSpedizione, dataSpedizione);
+		TestaCorrLight spedizioneLegacy = rdl.recuperaTestata(nomeRisorsa, riferimentoSpedizione, destinatarioSpedizione, dataSpedizione);
 		Spedizione spedizioneTrovata = recuperaSpedizione(spedizione);
 		//Se la spedizione era già presente vado in aggiornamento, altrimenti la inserisco.
 		if (spedizioneTrovata != null) {
@@ -179,7 +178,7 @@ public class Importatore {
 		}
 	}
 
-	private boolean inserisciSpedizione(DatiSpedizione spedizione, TestaCorr spedizioneLegacy) {
+	private boolean inserisciSpedizione(DatiSpedizione spedizione, TestaCorrLight spedizioneLegacy) {
 		JoinCommessaCorriere codice = trovaCodiceCliente(spedizione);
 		int idDocumento = getDocumento(codice, spedizione);
 		boolean inserimento = inserisciNuovaSpedizione(codice, idDocumento, spedizioneLegacy, spedizione);
@@ -237,7 +236,7 @@ public class Importatore {
 		return servizio;
 	}
 	
-	private boolean inserisciNuovaSpedizione(JoinCommessaCorriere codiceCliente, int idDocumento, TestaCorr vecchia, DatiSpedizione dati) {
+	private boolean inserisciNuovaSpedizione(JoinCommessaCorriere codiceCliente, int idDocumento, TestaCorrLight vecchia, DatiSpedizione dati) {
 		Spedizione spedizione = new Spedizione();
 		//Inserisci informazioni spedizione
 		spedizione.setIdDocumento(idDocumento);
@@ -590,7 +589,7 @@ public class Importatore {
 	 * @param spedizioneLegacy
 	 * @return
 	 */
-	private void aggiornaSpedizione(Spedizione spedizioneTrovata, DatiSpedizione spedizione, TestaCorr spedizioneLegacy) {
+	private void aggiornaSpedizione(Spedizione spedizioneTrovata, DatiSpedizione spedizione, TestaCorrLight spedizioneLegacy) {
 		// Aggiornamento dello stato
 		String messaggioStato = "Aggiornamento stato spedizione '" + spedizioneTrovata.getLetteraDiVettura() + "' ";
 		String statoCorriere = spedizione.getStatoAvanzamento();

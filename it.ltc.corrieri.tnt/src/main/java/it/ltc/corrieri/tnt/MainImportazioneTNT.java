@@ -27,8 +27,8 @@ public class MainImportazioneTNT {
 	private static String storicPath;
 	private static String errorPath;
 	private static MailMan mm;
-	private static List<String> destinatariTraffic;
-	private static List<String> destinatariIT;
+	private static Set<String> destinatariTraffic;
+	private static Set<String> destinatariIT;
 
 	public static void main(String[] args) {
 		logger.info("Avvio procedura.");
@@ -122,7 +122,7 @@ public class MainImportazioneTNT {
 		logger.info("(Import) Termine dell'importazione.");
 	}
 	
-	private static void inviaMail(List<String> riceventi, String subject, String message) {
+	private static void inviaMail(Set<String> riceventi, String subject, String message) {
 		Email mail = new Email(subject, message);
 		boolean invio = mm.invia(riceventi, mail);
 		if (!invio) {

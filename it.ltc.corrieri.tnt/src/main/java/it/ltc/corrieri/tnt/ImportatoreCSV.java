@@ -19,7 +19,7 @@ import it.ltc.database.model.centrale.Spedizione;
 import it.ltc.database.model.centrale.Spedizione.TipoSpedizione;
 import it.ltc.database.model.centrale.SpedizioneContrassegno;
 import it.ltc.database.model.centrale.enumcondivise.Fatturazione;
-import it.ltc.database.model.legacy.TestaCorr;
+import it.ltc.database.model.legacy.TestaCorrLight;
 import it.ltc.utility.csv.FileCSV;
 
 public class ImportatoreCSV {
@@ -45,7 +45,7 @@ public class ImportatoreCSV {
 	
 	public static void main(String[] args) throws Exception {
 		ImportatoreCSV importatore = ImportatoreCSV.getInstance();
-		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\trackingFebbraio.csv");
+		importatore.importaFile("C:\\Users\\Damiano\\Downloads\\tracking_maggio.csv");
 	}
 	
 	private ImportatoreCSV() {
@@ -71,6 +71,11 @@ public class ImportatoreCSV {
 		FileCSV csv = FileCSV.leggiFile(file, true, ";", ";", FileCSV.DEFAULT_DATE_FORMAT);
 		inserimenti = 0;
 		aggiornamenti = 0;
+		//Check codice clienti: Sonia è una stupidina quindi li controllo tutti prima.
+		for (String[] riga : csv.getRighe()) {
+			checkCodiceCliente(riga);
+		}
+		//Ora procedo con l'importazione vera e propria se non manca nessun codice cliente.
 		for (String[] riga : csv.getRighe()) {
 			importaSpedizione(riga);
 		}
@@ -79,7 +84,7 @@ public class ImportatoreCSV {
 		logger.info("Spedizioni importate: " + (inserimenti + aggiornamenti) + " su " + csv.getRighe().size());
 	}
 	
-	private TestaCorr recuperaTestaCorr(JoinCommessaCorriere codiceCliente, String[] riga) {
+	private TestaCorrLight recuperaTestaCorr(JoinCommessaCorriere codiceCliente, String[] riga) {
 		Commessa commessa = daoCommesse.trovaDaID(codiceCliente.getCommessa());
 		String nomeRisorsa = commessa != null ? commessa.getNomeRisorsa() : "";
 		String riferimentoSpedizione = riga[2];
@@ -90,8 +95,18 @@ public class ImportatoreCSV {
 		} catch (ParseException e) {
 			dataSpedizione = new Date();
 		}
-		TestaCorr vecchia = recuperaLegacy.recuperaTestata(nomeRisorsa, riferimentoSpedizione, destinatarioSpedizione, dataSpedizione);
+		TestaCorrLight vecchia = recuperaLegacy.recuperaTestata(nomeRisorsa, riferimentoSpedizione, destinatarioSpedizione, dataSpedizione);
 		return vecchia;
+	}
+	
+	public void checkCodiceCliente(String[] riga) {
+		String cc = riga[3];
+		if (cc.length() == 7)
+			cc = "0" + cc;
+		JoinCommessaCorriere codiceCliente = daoCodici.trovaDaCodice(cc);
+		if (codiceCliente == null) {
+			logger.error("Non è stato inserito il codice cliente: " + cc);
+		}
 	}
 	
 	public boolean importaSpedizione(String[] riga) {
@@ -102,7 +117,7 @@ public class ImportatoreCSV {
 				cc = "0" + cc;
 			JoinCommessaCorriere codiceCliente = daoCodici.trovaDaCodice(cc);
 			if (codiceCliente != null) {
-				TestaCorr vecchia = recuperaTestaCorr(codiceCliente, riga);
+				TestaCorrLight vecchia = recuperaTestaCorr(codiceCliente, riga);
 				Spedizione trovata = recuperaSpedizione(riga);
 				boolean spedizionePresente = (trovata != null);
 				if (spedizionePresente) {
@@ -164,7 +179,7 @@ public class ImportatoreCSV {
 		return volume;
 	}
 	
-	private boolean aggiornaSpedizione(Spedizione trovata, String[] riga, TestaCorr vecchia) {
+	private boolean aggiornaSpedizione(Spedizione trovata, String[] riga, TestaCorrLight vecchia) {
 		//Update info generali
 		trovata.setServizio(getTipoServizio(riga[21]));
 		//stato fatturazione, se ero indeciso se fatturarla perchè non ho ricevuto esiti corretti la segno come fatturabile.
@@ -257,7 +272,7 @@ public class ImportatoreCSV {
 		return idOrdine;
 	}
 	
-	private boolean inserisciNuovaSpedizione(JoinCommessaCorriere codiceCliente, int idDocumento, TestaCorr vecchia, String[] riga) throws Exception {
+	private boolean inserisciNuovaSpedizione(JoinCommessaCorriere codiceCliente, int idDocumento, TestaCorrLight vecchia, String[] riga) throws Exception {
 		Spedizione spedizione = new Spedizione();
 		//Inserisci informazioni spedizione
 		spedizione.setAssicurazione(false);

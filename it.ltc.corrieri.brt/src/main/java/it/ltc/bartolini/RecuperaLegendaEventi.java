@@ -78,7 +78,7 @@ public class RecuperaLegendaEventi extends Importatore {
 					nuovoStato.setStato(STATO_PROVVISORIO_BARTOLINI);
 					boolean inserimento = inserisciNuovoStato(nuovoStato);
 					if (inserimento) {
-						logger.info("Inserito il nuovo stato: " + id + ", " + descrizione);
+//						logger.info("Inserito il nuovo stato: " + id + ", " + descrizione);
 						legenda.put(id, nuovoStato);
 					} else {
 						String message = "Non è stato possibile inserire lo stato: " + id + ", " + descrizione;
@@ -99,12 +99,22 @@ public class RecuperaLegendaEventi extends Importatore {
 		EntityTransaction t = em.getTransaction();
 		try {
 			t.begin();
-			em.persist(stato);
+			TrackingStatoCodificaCorriere esistente = em.find(TrackingStatoCodificaCorriere.class, stato.getId());
+			if (esistente != null) {
+				if (!esistente.getDescrizione().equals(stato.getDescrizione())) {
+					esistente.setDescrizione(stato.getDescrizione());
+					em.merge(esistente);
+				} //altrimente non fare nulla.
+			} else {
+				em.persist(stato);
+			}			
 			t.commit();
 			inserimento = true;
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			inserimento = false;
-			t.rollback();
+			if (t != null && t.isActive())
+				t.rollback();
 		} finally {
 			em.close();
 		}
